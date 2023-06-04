@@ -69,6 +69,17 @@ async function run() {
             res.send({ token })
         })
 
+        // verify admin
+        const verifyAdmin = async(req, res, next) =>{
+            const email = req.decoded.email;
+            const query = {email: email};
+            const user = await UserCollection.findOne(query);
+            if(user?.role !== 'admin'){
+                return res.status(403).send({error: true, message: 'forbidden message'})
+            }
+            next();
+        }
+
         // create new user in db
         app.post('/newUser', async (req, res) => {
             const user = req.body;
@@ -128,6 +139,14 @@ async function run() {
             const result = await menusCollection.find().toArray()
             res.send(result)
         })
+
+        // post newItem from formData
+        app.post('/menus', verifyJWT, verifyAdmin, async(req, res)=>{
+            const newItem = req.body;
+            const result = await menusCollection.insertOne(newItem)
+            res.send(result) 
+        })
+
 
         // read reviews data from Bistro-Db
         app.get('/reviews', async (req, res) => {
