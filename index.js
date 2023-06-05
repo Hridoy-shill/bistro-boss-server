@@ -147,6 +147,14 @@ async function run() {
             res.send(result) 
         })
 
+        // delete specific menu from menus collection
+        app.delete('/menus/:id',verifyJWT, verifyAdmin, async(req, res)=>{
+            const id = req.params.id;
+            const query = {$or: [{_id: new ObjectId(id)}, {_id: id}]}
+            const result = await menusCollection.deleteOne(query);
+            res.send(result);
+        }) 
+
 
         // read reviews data from Bistro-Db
         app.get('/reviews', async (req, res) => {
